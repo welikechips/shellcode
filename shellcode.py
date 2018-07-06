@@ -188,6 +188,7 @@ def php_file():
                 fout.write(line)
 	fin.close()
 	fout.close()
+        print "File created and updated as: " + filename
 
 # =======================
 #    MENUS DEFINITIONS
