@@ -1,13 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-#title           :menu.py
-#description     :This program displays an interactive menu on CLI
+#title           :shellcode.py
+#description     :Help generate shellcode for a ctf
 #author          :
 #date            :
 #version         :0.1
-#usage           :python menu.py
-#notes           :
-#python_version  :2.7.6  
+#usage           :python shellcode lhost lport
 #=======================================================================
  
 # Import the modules needed to run the script.
