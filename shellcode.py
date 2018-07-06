@@ -196,7 +196,6 @@ def oneliner(shellcode):
 #Edit PHP Monkey's File	Menu 30
 def php_file_pentestmonkey():
         filename = "php-reverse-shell.php"
-        #os.system("rm " + filename)
 	fin = open("php-reverse-shell-template.php")
 	fout = open(filename, "wt")
 	for line in fin:
