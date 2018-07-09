@@ -31,7 +31,7 @@ menu_actions  = {}
 def main_menu():
     os.system('clear')
     
-    print "Working Directory is /root/ctf/,\n"
+    print "Working Directory is /root/ctf/shellcode,\n"
     print "What code are you looking for?"
     print "1. Reverse Shells"
     print "2. TTY Code"
@@ -196,7 +196,7 @@ def oneliner(shellcode):
 #Edit PHP Monkey's File	Menu 30
 def php_file_pentestmonkey():
         filename = "php-reverse-shell.php"
-	fin = open("php-reverse-shell-template.php")
+	fin = open("/root/ctf/shellcode/php-reverse-shell-template.php")
 	fout = open(filename, "wt")
 	for line in fin:
             if '127.0.0.1' in line :
