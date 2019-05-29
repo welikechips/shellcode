@@ -189,7 +189,6 @@ def java_war():
 def msfvenom(shellcode):
     warning ="Make sure you are using the correct payload in MSFConsole"
     os.system('clear')
-    '10': python_tty,
     print "Writing Shell"
     print shellcode
     os.system(shellcode)
