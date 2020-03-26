@@ -267,7 +267,7 @@ def exec_menu(choice, item=None):
 
 
 def footer_text():
-    print("99. Home")
+    print("\n\n99. Home")
     print("00. Quit")
 
 
