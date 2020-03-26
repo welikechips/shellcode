@@ -141,7 +141,7 @@ def getcwd():
 def main_menu(clear=True, items=None):
     if clear is True:
         cls()
-    print("Working Directory is {dir},\n".format(dir=getcwd()))
+    print("Working Directory is {dir},\n".format(dir=os.getcwd()))
     print("What code are you looking for?")
     for index, value in enumerate(items):
         print(str(index) + ": " + value['title'])
