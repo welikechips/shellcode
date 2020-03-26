@@ -1,0 +1,5 @@
+colorama==0.4.3
+netifaces==0.10.9
+pyfiglet==0.8.post1
+pyperclip==1.7.0
+termcolor==1.1.0

