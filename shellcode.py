@@ -63,7 +63,7 @@ def oneliner(payload):
     print(payload['payload'] + " Copied to clipboard")
     pyperclip.copy(payload['payload'])
     if 'tty' in payload and payload['tty'] is True:
-        print("Remember:")
+        print("\nRemember:")
         print("<ctrl+z> # to background"
               "\nstty raw -echo"
               "\nfg<enter>"
@@ -344,5 +344,13 @@ def handle_payloads(item):
 if __name__ == "__main__":
     # Launch main menu
     cls()
+    import sys
+    from colorama import init
+
+    init(strip=not sys.stdout.isatty())
+    from termcolor import colored
+    from pyfiglet import figlet_format
+
+    print(colored(figlet_format("Sh3llc0de", font="standard"), "blue"))
     show_ips.show_ips()
     main_menu(clear=False, items=payloads)
