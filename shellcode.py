@@ -190,6 +190,11 @@ payloads = [
                     host=args.host, port=args.port),
                 'function': {'function_name': oneliner}
             },
+            {
+                'title': '',
+                'payload': 'Generate PHP file pentest monkey',
+                'function': {'function_name': php_file_pentestmonkey}
+            },
         ]
     },
     {
@@ -218,19 +223,7 @@ payloads = [
                 'payload': 'perl: exec "/bin/sh";'
             },
         ]
-    },
-    {
-        'title': 'PHP Code',
-        'generate_title': 'Select a PHP Code to generate',
-        'function': {'function_name': None},
-        'submenu': [
-            {
-                'title': '',
-                'payload': 'Generate PHP file pentest monkey',
-                'function': {'function_name': php_file_pentestmonkey}
-            },
-        ]
-    },
+    }
 ]
 
 
