@@ -320,5 +320,6 @@ def handle_payloads(item):
 # Main Program
 if __name__ == "__main__":
     # Launch main menu
+    cls()
     show_ips.show_ips()
     main_menu(clear=False, items=payloads)
