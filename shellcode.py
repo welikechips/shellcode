@@ -13,7 +13,7 @@ import os
 import query_yes_no
 import pyperclip
 import argparse
-from netifaces import interfaces, ifaddresses, AF_INET
+import show_ips
 
 parser = argparse.ArgumentParser(description='Build shellcode for multiple platforms.')
 
@@ -134,16 +134,6 @@ def cls():
     os.system('cls' if os.name == 'nt' else 'clear')
 
 
-def show_ips():
-    my_ips = {}
-    for iface_name in interfaces():
-        addresses = [i['addr'] for i in ifaddresses(iface_name).setdefault(AF_INET, [{'addr': 'No IP addr'}])]
-        if "No IP addr" not in addresses:
-            my_ips[iface_name] = ', '.join(addresses)
-    print("\nIP address on this computer:")
-    print("\n".join(": ".join(_) for _ in sorted(my_ips.items())))
-
-
 def getcwd():
     return os.path.dirname(os.path.realpath(__file__))
 
@@ -229,5 +219,5 @@ def handle_payloads(item):
 # Main Program
 if __name__ == "__main__":
     # Launch main menu
-    show_ips()
+    show_ips.show_ips()
     main_menu(clear=False, items=payloads)
