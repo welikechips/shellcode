@@ -10,6 +10,7 @@
 
 # Import the modules needed to run the script.
 import os
+import query_yes_no
 import pyperclip
 import argparse
 from netifaces import interfaces, ifaddresses, AF_INET
@@ -29,14 +30,10 @@ def msf_generate(payload):
         payload['payload'], args.host, args.port)
     print("Generating payload: " + shell_code)
     os.system(shell_code)
-    print("Do you want to setup the listener?")
-    answer = input("Enter yes or no: ")
-    if answer == "yes":
+    if query_yes_no.query_yes_no("Do you want to setup the listener?"):
         os.system(terminal)
-    elif answer == "no":
-        exit()
     else:
-        print("Please enter yes or no.")
+        exit()
 
 
 def php_file_pentestmonkey(payload=None):
