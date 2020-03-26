@@ -376,6 +376,6 @@ if __name__ == "__main__":
     cls()
 
     print(info(figlet_format("Sh3llc0de", font="standard")))
-    print(ask("\nCreated By: Thomas Norberg and Matthew Hyde"))
+    print(ask("\nCreated By: jiveturkey and weirdatfirst"))
     show_ips.show_ips()
     main_menu(clear=False, items=payloads)
