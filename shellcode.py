@@ -135,6 +135,12 @@ payloads = [
                 "filename": args.msf_file_basename + "_64.exe"
             },
             {
+                "title": "windows/x64/meterpreter/reverse_tcp (powershell format)",
+                "payload": "windows/x64/meterpreter/reverse_tcp",
+                "format": "psh",
+                "filename": args.msf_file_basename + "_64.ps1"
+            },
+            {
                 "title": "",
                 "payload": "osx/x86/shell_reverse_tcp",
                 "format": "macho",
