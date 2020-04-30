@@ -316,7 +316,6 @@ def getcwd():
 def main_menu(clear=True, items=None):
     if clear is True:
         cls()
-    print(info("Working Directory is {dir}\n".format(dir=os.getcwd())))
     print(ask("Please select a menu option below:"))
     for index, value in enumerate(items):
         print(option(str(index) + ": " + value['title']))
@@ -345,6 +344,8 @@ def exec_menu(choice, item=None):
 
 
 def footer_text():
+    show_ips.show_ips()
+    print(info("Working Directory is {dir}\n".format(dir=os.getcwd())))
     print(option2("\n99. Home"))
     print(option2("00. Quit"))
 
@@ -401,5 +402,4 @@ if __name__ == "__main__":
 
     print(info(figlet_format("Sh3llc0de", font="standard")))
     print(ask("\nCreated By: jiveturkey and weirdatfirst"))
-    show_ips.show_ips()
     main_menu(clear=False, items=payloads)
